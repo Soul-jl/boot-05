@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" th:href="${#httpServletRequest.getContextPath()} + '/layui/css/layui.css'">
+    <!--引入zTree样式-->
+    <link rel="stylesheet" th:href="${#httpServletRequest.getContextPath()} + '/zTree/css/zTreeStyle/zTreeStyle.css'">
+
+    <style>
+
+        .layui-table-cell .layui-form-checkbox[lay-skin="primary"]{
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .data_tool_bar_div {
+            display:none;
+        }
+
+    </style>
+
+</head>
+<body class="layui-layout-body">
+
+<div class="layui-layout layui-layout-admin">
+    <!-- 顶部 -->
+    <div class="layui-header">
+        <!-- logo -->
+        <div class="layui-logo">layui 后台布局</div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <li class="layui-nav-item"><a href="">控制台</a></li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">其它系统</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">邮件管理</a></dd>
+                    <dd><a href="">消息管理</a></dd>
+                </dl>
+            </li>
+        </ul>
+
+        <!-- 右侧用户信息 -->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+                    贤心
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">基本资料</a></dd>
+                    <dd><a href="">安全设置</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="">退了</a></li>
+        </ul>
+    </div>
+
+    <!-- 左侧导航列表 -->
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+                <!-- 加载动态菜单 -->
+                <li th:each="menu : ${list}" th:object="${menu}" class="layui-nav-item"
+                    th:class="${menu.id == 1} ? 'layui-nav-item layui-nav-itemed' : 'layui-nav-item'">
+                    <a class="" href="javascript:;" th:text="${menu.name}"></a>
+                    <dl class="layui-nav-child">
+                        <dd th:each="m : ${menu.children}" th:object="${m}" th:if="${m.type == 'tree'}">
+                            <a th:text="${m.name}"
+                               th:href="|javascript:skip_page('${#httpServletRequest.getContextPath()}/${m.href}')|"></a>
+                        </dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 右侧内容区域 -->
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div id="index_body_content" style="padding: 15px;">内容主体区域</div>
+    </div>
+
+    <!-- 底部页脚 -->
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        © layui.com - 底部固定区域
+    </div>
+</div>
+
+
+
+<!-- 引入jquery资源库 -->
+<script type="text/javascript" th:src="${#httpServletRequest.getContextPath()} + '/jq/jquery.min.js'"></script>
+<!-- 引入layui资源库 -->
+<script type="text/javascript" th:src="${#httpServletRequest.getContextPath()} + '/layui/layui.all.js'"></script>
+<!-- 引入ztree资源库 -->
+<script type="text/javascript" th:src="${#httpServletRequest.getContextPath()} + '/zTree\js\jquery.ztree.all.js'"></script>
+
+
+<script>
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+
+    //点击左侧树实现右侧内容刷新
+    function skip_page(url){
+        $.ajax({
+            url:url,
+            success:function (data) {
+                $("#index_body_content").html(data);  //请求的界面数据在右侧显示
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

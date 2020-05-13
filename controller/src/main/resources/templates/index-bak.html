@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+写一句话${userName}
+<!--  -->
+<span th:text="${userName}"></span>
+<span th:utext="${userName}"></span>
+<input th:value="${userName}">
+<hr>
+<div th:each="userra : ${ulist}" th:object="${userra}">
+    <span th:text="${userra.userAccount}"></span>
+</div>
+
+<hr>
+<div th:each="sss : ${slist}">
+    <span th:text="${sss}"></span>
+</div>
+
+<hr>
+<div th:each="mmm : ${map}">
+    <span th:text="${mmm.key}"></span>
+    ：<span th:text="${mmm.value}"></span>
+</div>
+
+<hr>
+<!-- 条件判断 == != > < >= <= -->
+<span th:if="${userAge == 23}">ddddddd</span>
+<span th:text="${userAge ne 23} ? '3434' : 'sdfdsf'"></span>
+<span th:text="${userName != null} ? '默认值' : ${userName}"></span>
+
+
+https://www.cnblogs.com/nuoyiamy/p/5591559.html
+https://www.jianshu.com/p/5bbac20348ec
+
+</body>
+</html>

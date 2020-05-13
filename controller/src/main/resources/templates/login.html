@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!-- 引入layui样式 -->
+    <link rel="stylesheet" th:href="${#httpServletRequest.getContextPath()} + '/layui/css/layui.css'">
+    <!--引入zTree样式-->
+    <link rel="stylesheet" th:href="${#httpServletRequest.getContextPath()} + '/zTree/css/zTreeStyle/zTreeStyle.css'">
+
+
+
+</head>
+<body style="padding:60px">
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>登陆</legend>
+</fieldset>
+
+    <div style="padding: 20px; background-color: #F2F2F2;">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <!--<div class="layui-card-header">卡片面板</div>-->
+                    <div class="layui-card-body">
+                        <form class="layui-form layui-form-pane">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">用户名</label>
+                                <div class="layui-input-inline">
+                                    <input id="login_user_account" type="text" name="title" autocomplete="off" placeholder="请输入用户名" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">密码</label>
+                                <div class="layui-input-inline">
+                                    <input id="login_user_pwd" type="password" name="title" autocomplete="off" placeholder="请输入密码" class="layui-input">
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">验证码</label>
+                                <div class="layui-input-inline">
+                                    <input id="login_user_imgcode" type="text" name="title" autocomplete="off" placeholder="请输入验证码" class="layui-input">
+                                </div>
+                                <div class="layui-input-inline">
+                                        <span onclick="change_img_code()"><img id="img_code" th:src="${#httpServletRequest.getContextPath()} + '/imgcode'">
+                                            <font color="red">看不清，点击换一张</font>
+                                        </span>
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <a href="javascript:login()" class="layui-btn">登陆</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+<!-- 引入jquery资源库 -->
+<script type="text/javascript" th:src="${#httpServletRequest.getContextPath()} + '/jq/jquery.min.js'"></script>
+<!-- 引入layui资源库 -->
+<script type="text/javascript" th:src="${#httpServletRequest.getContextPath()} + '/layui/layui.all.js'"></script>
+<!-- 引入ztree资源库 -->
+<script type="text/javascript" th:src="${#httpServletRequest.getContextPath()} + '/zTree\js\jquery.ztree.all.js'"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var ctxPath = /*[[@{/}]]*/ '';
+        /*]]>*/
+    </script>
+
+    <script>
+
+        function login() {
+            $.ajax({
+                url:ctxPath + '/login',
+                data:{
+                    userAccount:$("#login_user_account").val(),
+                    userPwd:$("#login_user_pwd").val(),
+                    userImgCode:$("#login_user_imgcode").val()
+                },
+                success:function(data) {
+                    //判断登陆结果
+                    if (null != data && 1 == data.code) {
+                        //登陆成功，跳转到index主页
+                        location.href= ctxPath + '/';
+                    } else if(null != data && 2 == data.code) {
+                        layer.alert("验证码错误");
+                    } else {
+                        layer.alert("用户名或密码错误");
+                    }
+                }
+            });
+            
+        }
+
+
+    //千幻验证码
+        function change_img_code() {
+            $("#img_code").attr("src",ctxPath + "/imgcode?time" + new Date().getTime());
+            
+        }
+
+    </script>
+
+</body>
+</html>

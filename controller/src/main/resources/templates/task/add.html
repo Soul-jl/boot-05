@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+
+    <form id="task_add_form" class="layui-form layui-form-pane" style="padding:10px">
+        <div class="layui-form-item">
+            <div class="layui-form-label">任务名称</div>
+            <div class="layui-input-block">
+                <input name="taskKey" autocomplete="off" placeholder="请输入" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">任务描述</div>
+            <div class="layui-input-block">
+                <input name="taskDesc" autocomplete="off" placeholder="请输入" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">执行状态</div>
+            <div class="layui-input-block">
+                <input type="radio" name="taskFlag" value="0" title="稍后执行">
+                <input type="radio" name="taskFlag" value="1" title="立即执行">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">执行类</div>
+            <div class="layui-input-block">
+                <input name="taskClass" value="com.jy.common.MyTask" autocomplete="off" placeholder="请输入执行类" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">执行方法</div>
+            <div class="layui-input-block">
+                <input name="taskMethod" autocomplete="off" placeholder="请输入执行方法" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item layui-hide">
+            <input id="add_task_hide_btn" type="button" onclick="set_cron_to_add_task_input()">
+            <input id="task_cron" name="taskCron">
+        </div>
+    </form>
+    <div class="layui-form-item">
+        <div class="layui-form-label">执行规则</div>
+        <div class="layui-input-block">
+            <input id="cron" autocomplete="off" class="layui-input" />
+        </div>
+    </div>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var ctxPath = /*[[@{/}]]*/ '';
+        /*]]>*/
+    </script>
+    <script th:inline="none">
+
+        function set_cron_to_add_task_input() {
+            $("#task_cron").val($("#cron").val());
+        }
+
+        $(function() {
+            $("#cron").cronGen({
+                direction : 'left'
+            });
+        });
+
+        //获取form组件
+        var task_add_form = layui.form;
+        //渲染form样式
+        task_add_form.render();
+
+    </script>
+
+</body>
+</html>

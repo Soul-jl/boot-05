@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link rel="stylesheet" th:href="${#httpServletRequest.getContextPath()} + '/quartz/bootstrap.min.css'">
+    <link rel="stylesheet" th:href="${#httpServletRequest.getContextPath()} + '/quartz/font/font-awesome.min.css'">
+    <link rel="stylesheet" th:href="${#httpServletRequest.getContextPath()} + '/quartz/cronGen.css'">
+
+</head>
+<body>
+    <div id="task_dg_toolbar" style="display:none">
+        <!--添加-->
+            <button class="layui-btn layui-btn-normal layui-btn-sm" onclick="open_add_task_page()">
+                <i class="layui-icon">&#xe654;</i>
+            </button>
+        <!--删除-->
+            <button class="layui-btn layui-btn-danger layui-btn-sm" onclick="delete_checked_book()">
+                <i class="layui-icon">&#xe640;</i>
+            </button>
+
+        <!--修改-->
+        <button class="layui-btn layui-btn-warm layui-btn-sm" onclick="update_checked_book()">
+            <i class="layui-icon">&#xe642;</i>
+        </button>
+
+        <button type="button" class="layui-btn layui-btn-sm">
+            <i class="layui-icon">&#xe602;</i>
+        </button>
+    </div>
+
+    <!--右侧按钮组-->
+        <div id="task_dg_right_toolbar" class="data_tool_bar_div">
+            <a class="layui-btn layui-btn-xs" lay-event="delete">删除任务</a>
+            {{# if(d.taskFlag == 1){ }}
+            <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="stop">停止任务</a>
+            {{#}}}
+            {{# if(d.taskFlag != 1){ }}
+            <a class="layui-btn layui-btn-xs" lay-event="start">开始任务</a>
+            {{#}}}
+        </div>
+
+
+   <table id="task_dg" lay-filter="task_dg_f"></table>
+
+    <script type="text/javascript" th:src="${#httpServletRequest.getContextPath()} + '/quartz/cronGen.js'"></script>
+    <script type="text/javascript" th:src="${#httpServletRequest.getContextPath()} + '/quartz/bootstrap.min.js'"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var ctxPath = /*[[@{/}]]*/ '';
+        /*]]>*/
+    </script>
+        <script th:inline="none">
+        //得到table组件
+        var table = layui.table;
+
+        //第一个实例并且进行渲染
+        var task_list_table =  table.render({
+            //elem为谁渲染（task_dg）
+            elem: '#task_dg'
+            ,page:true
+            ,limits:[5,10]
+            ,limit:5
+            ,url: ctxPath + '/task/list'
+            ,cols: [[ //表头
+                 {type:'checkbox'}//开启复选框
+                ,{field: 'taskID', title: '序号', width:80, sort: true}
+                ,{field: 'taskKey', title: '任务名称', width:120}
+                ,{field: 'taskDesc', title: '任务描述', width:100}
+                ,{field: 'taskCron', title: '验证规则', width:120}
+                ,{field: 'taskFlag', title: '执行状态', width:100,templet:function(d) {
+                        return d.taskFlag == "1" ? "正在执行" : "等待执行";
+                    }}
+                ,{field: 'taskClass', title: '执行类', width:180}
+                ,{field: 'taskMethod', title: '执行方法', width:110}
+                ,{fixed: 'right', title: '操作', toolbar: '#task_dg_right_toolbar', width:180}
+            ]]
+               ,toolbar:"#task_dg_toolbar"
+        });
+
+        //配置数据表格的监听
+        table.on("tool(task_dg_f)", function(obj) {
+            var data = obj.data;
+            if ("delete" == obj.event) {
+                //删除按钮被点击了
+                delete_task(data.taskID, data.taskFlag);
+            }
+            if ("stop" == obj.event) {
+                //停止按钮被点击了
+                update_task(data.taskID, "stop");
+            }
+            if ("start" == obj.event) {
+                //开始按钮被点击了
+                update_task(data.taskID, "start");
+            }
+        });
+
+        //删除任务
+        function delete_task(task_id, task_flag) {
+            layer.confirm("是否确认删除任务？",{title:'删除提示'},function(index) {
+                $.get(ctxPath + "/task/deleteTask", {taskID:task_id, taskFlag:task_flag},function(data) {
+                    //关闭提示框
+                    layer.close(index);
+                    //刷新列表
+                    task_list_table.reload();
+                });
+            });
+        }
+
+        //修改任务
+        function update_task(task_id, btn) {
+            $.get(ctxPath + "/task/updateTask", {taskID:task_id, btn:btn},function(data) {
+                //刷新列表
+                task_list_table.reload();
+            });
+        }
+
+        //打开添加页面
+        function open_add_task_page() {
+            //发起ajax请求获添加页面
+            $.ajax({
+                url:ctxPath + '/task/toAdd',
+                success:function(data) {
+                    var layer = layui.layer;
+                    var task_add_layer =  layer.open({
+                        type:1,
+                        title:"添加新任务",
+                        content:data,
+                        area: ['750px', '500px'],
+                        anim:1,
+                        maxmin: true,
+                        btn:['提交','取消'],
+                        yes:function() {
+                            //使用js触发添加页面隐藏按钮的点击时间
+                            $("#add_task_hide_btn").click();
+                            //把数据提交到后台
+                            $.ajax({
+                                url: ctxPath + '/task/insert',
+                                data:$("#task_add_form").serialize(),
+                                success:function() {
+                                    //关闭对话框
+                                    layer.close(task_add_layer);
+                                    //刷新列表
+                                    task_list_table.reload();
+                                }
+                            });
+                        },
+                        skin:"layui-layer-lan",
+                    });
+                }
+            });
+        }
+
+
+        // //删除过时的书籍
+        // function delete_checked_book() {
+        //     //获取选中数据（后面的参数是table元素的id属性值）
+        //     var book_rows = table.checkStatus("book_dg");
+        //     if (null != book_rows.data && book_rows.data.length > 0) {
+        //         //提示是否删除数据
+        //         layer.confirm('您确认要删除这本书籍吗？', {icon: 3, title:'提示'}, function(index){
+        //             //声明一个空字符串，用来拼写id
+        //             var book_ids = "";
+        //             //获取到所有选中数据的id
+        //             for (var i = 0; i < book_rows.data.length; i++) {
+        //                 book_ids = book_ids + "," + book_rows.data[i].bookID;
+        //             }
+        //             if (0 < book_ids.length) {
+        //                 //截取掉第一个逗号
+        //                 book_ids = book_ids.substring(1);
+        //             }
+        //             //进行ajax删除
+        //             $.ajax({
+        //                 url:ctxPath + '/book/deleteAll',
+        //                 data:{bookIDS:book_ids},
+        //                 //dataType:"",//返回值类型
+        //                 //type:"",//请求提交方式（get/post）
+        //                 success:function(data) {
+        //                     //关闭对话框
+        //                     layer.close(index);
+        //                     //重新刷新列表
+        //                     book_list_table.reload();
+        //                 }
+        //             });
+        //         });
+        //     } else {
+        //         layer.msg('请至少选择一条');
+        //     }
+        // }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+
+#配置服务信息
+server:
+  port: 8080 #项目端口
+  servlet:
+    context-path: /boot-01 #项目上下文（项目名）
+
+#配置spring信息
+spring:
+  #数据库
+  datasource:
+    url: jdbc:mysql://localhost:3306/1908_b
+    driverClassName: com.mysql.jdbc.Driver
+    username: root
+    password:
+    type: com.alibaba.druid.pool.DruidDataSource #连接池类型
+    #配置连接池
+    druid:
+      # 初始化大小，最小，最大
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+  #页面模板
+  thymeleaf:
+    encoding: UTF-8
+    #suffix: .html #页面文件后缀，默认值（.html）
+    #prefix: classpath:/templates/ #页面路径，默认值（classpath:/templates/）
+
+#mybatis配置
+mybatis:
+  #实体类路径
+  type-aliases-package: com.jy.model
+  #mapperLocations: classpath:/mapper/*.xml#加载sql文件
+  #mybatis.cfg.xml文件中的settings
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #这个是可以打印sql、参数、查询结果的
+    #log-impl: org.apache.ibatis.logging.log4j.Log4jImpl #这个不打印查询结果
+
+mapperScannerConfigurer:
+  #扫描持久层接口
+  basePackage: com.jy.mapper
+
+#分页组件
+pagehelper:
+  offsetAsPageNum: true
+  rowBoundsWithCount: true
+  pageSizeZero: true
+  reasonable: false
+  params: pageNum=pageHelperStart;pageSize=pageHelperRows;
+  supportMethodsArguments: false
+  returnPageInfo: none
+
+#打印sql部分
+log4j:
+  rootLogger: info,ServerDailyRollingFile,stdout
+  logger:
+    com:
+      jy:
+        mapper: DEBUG
+
+
+
+
+
